@@ -5,7 +5,9 @@ import functools
 
 def curry(lazy = True, allow_override = False, use_defaults = False):
 	"""
-	Decorator to create curried versions of functions. Works with python 2 and 3:
+	Decorator to create curried versions of functions. Works with python 2 and 3.
+
+		Some examples: (for excessive examples see the testsuite at the bottom)
 
 		>>> from curry import curry
 		>>> @curry()
@@ -30,6 +32,17 @@ def curry(lazy = True, allow_override = False, use_defaults = False):
 		Optionally allows overriding of parameters already given by giving keyword parameters.
 
 		Optionally uses the default parameters of the function.
+
+		Decorate an existing function:
+
+		>>> def f(x,y):
+		...     print(x,y)
+		... 
+		>>> g = curry()(f)
+		>>> h=g(1)
+		>>> i=h(2)
+		>>> i()
+		1 2
 
 	Authors:
 		* David R. Piegdon
