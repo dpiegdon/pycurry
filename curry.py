@@ -180,6 +180,14 @@ def _testsuite():
 		raise Exception("Multi-currying does not work.")
 
 	###
+	try:
+		print(f(1,2,3)())
+		raise Exception("Enforced evaluation with missing parameters does not result in error.")
+	except TypeError as e:
+		if str(e) != "f() missing 1 required positional argument: 'd'":
+			raise
+
+	###
 	f1 = f(z=7)(a=1)(2)(3)(4)(5)(6)
 	if not inspect.isfunction(f1):
 		raise Exception("Excessive currying does not work")
