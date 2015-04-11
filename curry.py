@@ -98,7 +98,11 @@ def _set_argument(fun, argspec, current_args, allow_override, new_arg, new_val):
 	current_args[new_arg] = new_val
 
 def _first_free_arg(fun, argspec, current_args):
-	for arg in argspec.args:
+	if inspect.ismethod(fun):
+		valid_args = argspec.args[1:] # skip bound object for methods
+	else:
+		valid_args = argspec.args
+	for arg in valid_args:
 		if not arg in current_args:
 			return arg;
 	raise TypeError("{}() takes {} positional arguments but more were given".format(fun.__name__, len(argspec.args)))
@@ -213,6 +217,28 @@ def _testsuite():
 		if str(e) != "f() takes 7 positional arguments but more were given":
 			raise
 
+	### method currying
+	class I():
+		f = 0
+		def add_product(self, x, y):
+			self.f = self.f + x*y
+			return self.f
+		@curry(allow_override=True)
+		def sub_product(self, x, y):
+			self.f = self.f - x*y
+			return self.f
+	
+	i = I()
+	j = curry()(i.add_product)
+	k = j(2)
+	if 6 != k(3)():
+		raise Exception("Currying of bound methods does not work.")
+	l = i.sub_product
+	if -29 != l(5)(7, self=i)():
+		raise Exception("Currying of unbound methods in class-definition does not work.")
+	m = I.sub_product(i)(11)(13)
+	if -172 != m():
+		raise Exception("Currying of unbound methods in class-definition does not work.")
 
 	### check non-lazyness
 	@curry(lazy = False, allow_override = False, use_defaults = False)
